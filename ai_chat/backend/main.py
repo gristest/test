@@ -15,7 +15,13 @@ app = FastAPI(title="AI Chat API", version="1.0.0")
 # 配置CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 在生产环境中应该设置具体的域名
+    allow_origins=[
+        "http://localhost:12000",
+        "http://127.0.0.1:12000",
+        "https://work-1-zrjouldkqnbapmiu.prod-runtime.all-hands.dev",
+        "https://work-2-zrjouldkqnbapmiu.prod-runtime.all-hands.dev",
+        "*"  # 允许所有来源（开发环境）
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
