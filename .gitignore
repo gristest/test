@@ -1,3 +1,6 @@
+# by zhb: vs code environment files
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -145,3 +148,4 @@ ai_chat/frontend/node_modules/
 ai_chat/frontend/dist/
 ai_chat/uploads/
 ai_chat/test_server.log
+ai_chat/backend/chat.db
