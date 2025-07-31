@@ -141,11 +141,10 @@ dmypy.json
 cython_debug/
 
 # AI Chat Application specific
-ai_chat/chat.db
 ai_chat/backend/*.log
+ai_chat/backend/chat.db
 ai_chat/frontend/*.log
 ai_chat/frontend/node_modules/
 ai_chat/frontend/dist/
 ai_chat/uploads/
 ai_chat/test_server.log
-ai_chat/backend/chat.db
