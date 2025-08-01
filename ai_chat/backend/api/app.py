@@ -1,9 +1,17 @@
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import sqlite3
 import os
 
 app = Flask(__name__)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:8080"],
+        "methods": ["GET", "POST", "PUT", "DELETE"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Database setup
 DATABASE = os.path.join(os.path.dirname(__file__), '../database/chat.db')
