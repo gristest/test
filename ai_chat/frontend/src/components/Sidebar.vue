@@ -37,16 +37,22 @@
           @keyup.esc="cancelEdit(conversation)"
           ref="titleInput"
         />
-        <button 
-          class="edit-btn"
-          @click.stop="startEdit(conversation)"
-          v-if="!conversation.editing"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="m18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-          </svg>
-        </button>
+        <div class="menu-container" v-if="!conversation.editing">
+          <button 
+            class="menu-btn"
+            @click.stop="toggleMenu(conversation.id)"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="6" r="1"/>
+              <circle cx="12" cy="12" r="1"/>
+              <circle cx="12" cy="18" r="1"/>
+            </svg>
+          </button>
+          <div v-if="activeMenu === conversation.id" class="dropdown-menu">
+            <div class="menu-item" @click.stop="startEdit(conversation)">Modify Title</div>
+            <div class="menu-item" @click.stop="deleteConversation(conversation.id)">Delete</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -67,7 +73,8 @@ export default {
   },
   data() {
     return {
-      isCollapsed: false
+      isCollapsed: false,
+      activeMenu: null
     }
   },
   methods: {
@@ -83,6 +90,7 @@ export default {
     startEdit(conversation) {
       conversation.editing = true
       conversation.editTitle = conversation.title
+      this.activeMenu = null
       this.$nextTick(() => {
         const input = this.$refs.titleInput?.[0]
         if (input) {
@@ -100,6 +108,13 @@ export default {
     cancelEdit(conversation) {
       conversation.editing = false
       conversation.editTitle = conversation.title
+    },
+    toggleMenu(conversationId) {
+      this.activeMenu = this.activeMenu === conversationId ? null : conversationId
+    },
+    deleteConversation(conversationId) {
+      this.$emit('delete-conversation', conversationId)
+      this.activeMenu = null
     }
   }
 }
@@ -236,6 +251,54 @@ export default {
 
 .edit-btn:hover {
   background-color: #4d4d4d;
+}
+
+.menu-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: #8e8ea0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.conversation-item:hover .menu-btn {
+  opacity: 1;
+}
+
+.menu-btn:hover {
+  background-color: #4d4d4d;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #2d2d2d;
+  border: 1px solid #4d4d4d;
+  border-radius: 4px;
+  z-index: 100;
+  min-width: 120px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.menu-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #10a37f;
 }
 
 /* 响应式设计 */

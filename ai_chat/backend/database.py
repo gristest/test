@@ -175,6 +175,26 @@ class Database:
         conn.close()
         return messages
     
+    def delete_conversation(self, conversation_id: int) -> bool:
+        """Delete a conversation and all its messages"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        try:
+            # Delete associated messages first
+            cursor.execute("DELETE FROM messages WHERE conversation_id = ?", (conversation_id,))
+            # Delete the conversation
+            cursor.execute("DELETE FROM conversations WHERE id = ?", (conversation_id,))
+            
+            success = cursor.rowcount > 0
+            conn.commit()
+            return success
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
     def save_file(self, filename: str, original_filename: str, file_path: str, 
                   file_size: int, conversation_id: Optional[int] = None) -> int:
         """保存文件信息"""

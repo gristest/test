@@ -97,6 +97,20 @@ async def update_conversation(conversation_id: int, conversation_update: Convers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.delete("/api/conversations/{conversation_id}", response_model=dict)
+async def delete_conversation(conversation_id: int):
+    """删除对话及其所有消息"""
+    try:
+        success = db.delete_conversation(conversation_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        return {"message": "Conversation deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/conversations/{conversation_id}/messages", response_model=List[Message])
 async def get_messages(conversation_id: int):
     """获取对话的所有消息"""

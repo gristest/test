@@ -6,6 +6,7 @@
       @create-new-chat="createNewChat"
       @select-conversation="selectConversation"
       @update-conversation-title="updateConversationTitle"
+      @delete-conversation="deleteConversation"
     />
     
     <ChatArea 
@@ -115,6 +116,33 @@ export default {
         this.showError('更新对话标题失败')
       }
     },
+
+    
+    async deleteConversation(conversationId) {
+      if (!confirm('确定要删除这个对话吗？此操作不可撤销。')) return
+      
+      try {
+        await chatApi.deleteConversation(conversationId)
+        
+        // 更新本地数据
+        const index = this.conversations.findIndex(c => c.id === conversationId)
+        if (index !== -1) {
+          this.conversations.splice(index, 1)
+        }
+        
+        // 如果当前对话是被删除的对话，重置当前对话
+        if (this.currentConversationId === conversationId) {
+          this.currentConversationId = null
+          this.currentConversation = null
+        }
+        
+        this.showSuccess('对话已成功删除')
+      } catch (error) {
+        console.error('Failed to delete conversation:', error)
+        this.showError('删除对话失败')
+      }
+    },
+
     
     async sendMessage(content) {
       if (!this.currentConversationId || !content.trim()) return
