@@ -7,7 +7,7 @@ const getApiBaseUrl = () => {
   if (hostname === 'work-1-zrjouldkqnbapmiu.prod-runtime.all-hands.dev') {
     return 'https://work-2-zrjouldkqnbapmiu.prod-runtime.all-hands.dev/api'
   }  
-  return `http://${hostname}:54590/api`
+  return `http://${hostname}:8000/api`
 }
 
 const API_BASE_URL = getApiBaseUrl()
