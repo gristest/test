@@ -17,6 +17,7 @@
 <script>
 import ChatSidebar from './components/Sidebar.vue'
 import ChatMainContent from './components/MainContent.vue'
+import api from '@/services/api'
 
 export default {
   name: 'App',
@@ -27,12 +28,33 @@ export default {
   data() {
     return {
       currentConversation: null,
-      sidebarCollapsed: false
+      sidebarCollapsed: false,
+      conversations: []
     }
   },
+  async created() {
+    await this.loadConversations()
+  },
   methods: {
-    handleNewConversation(convId) {
-      this.currentConversation = convId
+    async loadConversations() {
+      try {
+        const { data } = await api.getConversations()
+        this.conversations = data
+        if (data.length && !this.currentConversation) {
+          this.currentConversation = data[0].id
+        }
+      } catch (error) {
+        console.error('Failed to load conversations:', error)
+      }
+    },
+    async handleNewConversation() {
+      try {
+        const { data } = await api.createConversation()
+        this.currentConversation = data.id
+        await this.loadConversations()
+      } catch (error) {
+        console.error('Failed to create conversation:', error)
+      }
     },
     toggleSidebar() {
       this.sidebarCollapsed = !this.sidebarCollapsed
