@@ -1,0 +1,36 @@
+
+
+@import 'variables';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: $text-color;
+  line-height: 1.6;
+}
+
+button {
+  cursor: pointer;
+  padding: 8px 16px;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  background: white;
+  transition: all $transition-duration $transition-easing;
+
+  &:hover {
+    background: darken(white, 5%);
+  }
+}
+
+input, textarea {
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+}
+
