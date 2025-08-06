@@ -151,4 +151,4 @@ ai_chat/test_server.log
 
 # by zhb
 node_modules
-conversation.db
+conversations.db
