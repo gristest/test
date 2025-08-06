@@ -148,3 +148,7 @@ ai_chat/frontend/node_modules/
 ai_chat/frontend/dist/
 ai_chat/uploads/
 ai_chat/test_server.log
+
+# by zhb
+node_modules
+conversation.db
