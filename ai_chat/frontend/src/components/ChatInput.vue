@@ -13,7 +13,7 @@ export default {
     };
   },
   methods: {
-    sendMessage() {
+    async sendMessage() {
       if (this.message.trim()) {
         try {
           await axios.post(`/api/chats/${this.$parent.selectedChatId}/records/`, {
