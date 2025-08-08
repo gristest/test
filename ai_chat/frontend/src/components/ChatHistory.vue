@@ -14,7 +14,7 @@ export default {
     };
   },
   watch: {
-    '$parent.selectedChatId': {
+    selectedChatId: {
       immediate: true,
       handler(newChatId) {
         if (newChatId) {

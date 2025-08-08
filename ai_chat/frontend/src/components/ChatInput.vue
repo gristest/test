@@ -6,8 +6,10 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 export default {
-  data() {
+  setup() {
+    const selectedChatId = inject('selectedChatId');
     return {
       message: ''
     };
@@ -16,10 +18,10 @@ export default {
     async sendMessage() {
       if (this.message.trim()) {
         try {
-          await axios.post(`/api/chats/${this.$parent.selectedChatId}/records/`, {
+          await axios.post(`/api/chats/${selectedChatId}/records/`, {
             content: this.message
           });
-          this.$parent.$refs.chatHistory.fetchChatRecords(this.$parent.selectedChatId);
+          this.$parent.$refs.chatHistory.fetchChatRecords(selectedChatId);
         } catch (error) {
           console.error('Error sending message:', error);
         }
