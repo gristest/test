@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "AI Chat Frontend Application",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 53897",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 53897",
-    "serve": "vite preview --host 0.0.0.0 --port 53897"
+    "preview": "vite preview",
+    "serve": "vite preview"
   },
   "dependencies": {
     "vue": "^3.3.4",

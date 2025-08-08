@@ -94,7 +94,7 @@
                 <User />
               </el-icon>
               <el-icon v-else>
-                <Robot />
+                <UserFilled />
               </el-icon>
             </div>
             <div class="message-content">
@@ -106,7 +106,7 @@
           <!-- 加载中提示 -->
           <div v-if="chatStore.loading && isWaitingForResponse" class="message-item assistant">
             <div class="message-avatar">
-              <el-icon><Robot /></el-icon>
+              <el-icon><UserFilled /></el-icon>
             </div>
             <div class="message-content">
               <div class="typing-indicator">
@@ -181,7 +181,7 @@ import { useChatStore } from '@/store/chat'
 import { fileApi } from '@/api/file'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
-  Plus, Edit, Delete, User, Robot, Paperclip, 
+  Plus, Edit, Delete, User, UserFilled, Paperclip, 
   Expand, Fold 
 } from '@element-plus/icons-vue'
 
