@@ -41,6 +41,13 @@ export const useChatStore = defineStore('chat', {
     async createConversation(title = null) {
       try {
         this.loading = true
+        
+        // Generate temporary title if not provided
+        if (!title) {
+          const now = new Date()
+          title = `新对话 ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`
+        }
+        
         const response = await chatApi.createConversation(title)
         if (response.success) {
           this.conversations.unshift(response.data)

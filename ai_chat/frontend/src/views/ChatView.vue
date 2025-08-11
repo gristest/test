@@ -4,6 +4,7 @@
     <div 
       class="sidebar" 
       :class="{ collapsed: chatStore.sidebarCollapsed }"
+      :style="{ width: chatStore.sidebarCollapsed ? '60px' : '280px' }"
     >
       <div class="sidebar-header">
         <el-button 
@@ -315,6 +316,13 @@ const deleteConversation = async (conversationId) => {
 
 // 文件上传
 const handleFileUpload = async (file) => {
+  // 验证文件大小 (10MB limit)
+  const MAX_SIZE = 10 * 1024 * 1024 // 10MB
+  if (file.size > MAX_SIZE) {
+    ElMessage.error(`文件大小不能超过10MB，当前文件为${formatFileSize(file.size)}`)
+    return false
+  }
+
   try {
     const response = await fileApi.uploadFile(file)
     ElMessage.success(`文件 ${file.name} 上传成功`)
