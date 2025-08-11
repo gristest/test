@@ -1,17 +1,12 @@
+
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
 
 export default defineConfig({
   plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  },
   server: {
+    port: 5173,
     host: '0.0.0.0',
-    port: 8000,
     cors: true,
     proxy: {
       '/api': {
@@ -20,11 +15,5 @@ export default defineConfig({
         secure: false
       }
     }
-  },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: false,
-    minify: 'esbuild'
   }
 })

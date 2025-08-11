@@ -1,26 +1,19 @@
+
+
 import { createRouter, createWebHistory } from 'vue-router'
-// Removed unused import
 import ChatView from '../views/ChatView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: ChatView,
-    meta: { requiresAuth: false }
+    component: ChatView
   },
   {
-    path: '/chat',
+    path: '/chat/:id?',
     name: 'Chat',
     component: ChatView,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/chat/:id',
-    name: 'Conversation',
-    component: ChatView,
-    props: true,
-    meta: { requiresAuth: false }
+    props: true
   }
 ]
 
@@ -30,3 +23,4 @@ const router = createRouter({
 })
 
 export default router
+

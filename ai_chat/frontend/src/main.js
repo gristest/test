@@ -1,14 +1,13 @@
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-
-// by zhb:
-import { createPinia } from 'pinia'
+import store from './store'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 
 const app = createApp(App)
-
-// by zhb: 注册 Pinia
-app.use(createPinia())  // <-- 注册 Pinia
-
 app.use(router)
+app.use(store)
+app.use(ElementPlus)
 app.mount('#app')
