@@ -26,7 +26,7 @@ class FileService:
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in self.allowed_extensions
     
-    def upload_file(self, file: FileStorage) -> Dict:
+    def upload_file(self, file: FileStorage) -> Dict:        
         """上传文件"""
         if not file or file.filename == '':
             raise ValueError("没有选择文件")
@@ -35,7 +35,9 @@ class FileService:
             raise ValueError(f"不支持的文件类型。支持的类型：{', '.join(self.allowed_extensions)}")
         
         # 生成唯一文件名
-        original_filename = secure_filename(file.filename)
+        # by zhb: 
+        # #original_filename = secure_filename(file.filename)
+        original_filename = file.filename
         file_extension = original_filename.rsplit('.', 1)[1].lower()
         unique_filename = f"{uuid.uuid4().hex}.{file_extension}"
         

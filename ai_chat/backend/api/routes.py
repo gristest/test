@@ -182,7 +182,7 @@ def send_message(conversation_id):
 @api_bp.route('/upload', methods=['POST'])
 def upload_file():
     """上传文件"""
-    try:
+    try:        
         if 'file' not in request.files:
             return jsonify({
                 'success': False,

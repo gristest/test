@@ -23,7 +23,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import ChatWindow from '@/components/ChatWindow.vue'
 import { fetchConversations, createConversation, getMessages, sendMessage as apiSendMessage} from '@/api/chat'
-import { uploadFile } from '@/api/file'
+import { uploadFile as apiUploadFile} from '@/api/file'
 
 export default {
   components: { Sidebar, ChatWindow },
@@ -97,9 +97,16 @@ export default {
       
       loading.value = true
       try {
+        messages.value.push({
+          content,
+          role: 'user',
+          timestamp: new Date().toISOString()
+        })
         const response = await apiSendMessage(currentConversation.value.id, content)
         if (response.success) {
-          messages.value.push(response.data)
+          messages.value.pop() // Remove user message from UI
+          messages.value.push(response.data.user_message)
+          messages.value.push(response.data.ai_message)
         } else {
           console.error('Failed to send message: API returned success=false')
         }
@@ -120,7 +127,7 @@ export default {
       
       loading.value = true
       try {
-        const uploadResponse = await uploadFile(file)
+        const uploadResponse = await apiUploadFile(file)
         if (!uploadResponse.success) {
           console.error('文件上传失败: API returned success=false')
           return
