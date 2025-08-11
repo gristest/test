@@ -22,7 +22,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Sidebar from '@/components/Sidebar.vue'
 import ChatWindow from '@/components/ChatWindow.vue'
-import { fetchConversations, createConversation, getMessages, sendMessage } from '@/api/chat'
+import { fetchConversations, createConversation, getMessages, sendMessage as apiSendMessage} from '@/api/chat'
 import { uploadFile } from '@/api/file'
 
 export default {
@@ -97,7 +97,7 @@ export default {
       
       loading.value = true
       try {
-        const response = await sendMessage(currentConversation.value.id, content)
+        const response = await apiSendMessage(currentConversation.value.id, content)
         if (response.success) {
           messages.value.push(response.data)
         } else {
@@ -127,7 +127,7 @@ export default {
         }
         if (currentConversation.value) {
           const fileMessage = `[文件] ${file.name} (${formatFileSize(file.size)})`
-          await sendMessage(currentConversation.value.id, fileMessage)
+          await apiSendMessage(currentConversation.value.id, fileMessage)
         }
       } catch (error) {
         console.error('文件上传失败:', error)
