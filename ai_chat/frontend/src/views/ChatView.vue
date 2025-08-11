@@ -56,8 +56,13 @@ export default {
       loading.value = true
       try {
         currentConversation.value = conversations.value.find(c => c.id === id)
-        messages.value = await getMessages(id)
-        router.push(`/chat/${id}`)
+        const response = await getMessages(id)
+        if (response.success) {
+          messages.value = response.data
+          router.push(`/chat/${id}`)
+        } else {
+          console.error('Failed to load messages: API returned success=false')
+        }
       } catch (error) {
         console.error('Failed to load conversation:', error)
       } finally {
@@ -69,11 +74,16 @@ export default {
     const createNewConversation = async () => {
       loading.value = true
       try {
-        const conversation = await createConversation()
-        conversations.value.unshift(conversation)
-        currentConversation.value = conversation
-        messages.value = []
-        router.push(`/chat/${conversation.id}`)
+        const response = await createConversation()
+        if (response.success) {
+          const conversation = response.data
+          conversations.value.unshift(conversation)
+          currentConversation.value = conversation
+          messages.value = []
+          router.push(`/chat/${conversation.id}`)
+        } else {
+          console.error('Failed to create conversation: API returned success=false')
+        }
       } catch (error) {
         console.error('Failed to create conversation:', error)
       } finally {
@@ -87,8 +97,12 @@ export default {
       
       loading.value = true
       try {
-        const newMessage = await sendMessage(currentConversation.value.id, content)
-        messages.value.push(newMessage)
+        const response = await sendMessage(currentConversation.value.id, content)
+        if (response.success) {
+          messages.value.push(response.data)
+        } else {
+          console.error('Failed to send message: API returned success=false')
+        }
       } catch (error) {
         console.error('Failed to send message:', error)
       } finally {
@@ -106,7 +120,11 @@ export default {
       
       loading.value = true
       try {
-        await uploadFile(file)
+        const uploadResponse = await uploadFile(file)
+        if (!uploadResponse.success) {
+          console.error('文件上传失败: API returned success=false')
+          return
+        }
         if (currentConversation.value) {
           const fileMessage = `[文件] ${file.name} (${formatFileSize(file.size)})`
           await sendMessage(currentConversation.value.id, fileMessage)
