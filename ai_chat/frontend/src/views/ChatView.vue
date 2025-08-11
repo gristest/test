@@ -40,7 +40,7 @@ export default {
     onMounted(async () => {
       loading.value = true
       try {
-        conversations.value = await fetchConversations()
+        conversations.value = (await fetchConversations()).data
         if (route.params.id) {
           selectConversation(route.params.id)
         }
