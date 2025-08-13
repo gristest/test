@@ -11,6 +11,8 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:5173", # Vite default port
+    "http://localhost:8887", # 添加你的前端实际运行端口
+    "http://192.168.20.32:8887", # 添加你的前端实际运行端口
 ]
 
 app.add_middleware(

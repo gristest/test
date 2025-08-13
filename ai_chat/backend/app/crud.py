@@ -34,7 +34,7 @@ def get_messages(db: Session, chat_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.Message).filter(models.Message.chat_id == chat_id).offset(skip).limit(limit).all()
 
 def create_chat_message(db: Session, message: schemas.MessageCreate, chat_id: int):
-    db_message = models.Message(**message.dict(), chat_id=chat_id)
+    db_message = models.Message(**message.model_dump(), chat_id=chat_id)
     db.add(db_message)
     db.commit()
     db.refresh(db_message)

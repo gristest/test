@@ -37,8 +37,8 @@ def read_chat(chat_id: int, db: Session = Depends(get_db)):
     return db_chat
 
 @router.put("/{chat_id}", response_model=schemas.Chat)
-def update_chat_name(chat_id: int, name: str, db: Session = Depends(get_db)):
-    db_chat = crud.update_chat_name(db, chat_id=chat_id, name=name)
+def update_chat_name(chat_id: int, chat_update: schemas.ChatUpdate, db: Session = Depends(get_db)):
+    db_chat = crud.update_chat_name(db, chat_id=chat_id, name=chat_update.name)
     if db_chat is None:
         raise HTTPException(status_code=404, detail="Chat not found")
     return db_chat

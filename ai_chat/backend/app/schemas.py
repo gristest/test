@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
 import datetime
 
@@ -15,8 +15,7 @@ class Message(MessageBase):
     chat_id: int
     created_at: datetime.datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class UploadedFileBase(BaseModel):
     filename: str
@@ -30,14 +29,16 @@ class UploadedFile(UploadedFileBase):
     chat_id: int
     created_at: datetime.datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ChatBase(BaseModel):
     name: str
 
-class ChatCreate(ChatBase):
-    pass
+class ChatCreate(BaseModel):
+    name: Optional[str] = None
+
+class ChatUpdate(BaseModel):
+    name: str
 
 class Chat(ChatBase):
     id: int
@@ -45,5 +46,4 @@ class Chat(ChatBase):
     messages: List[Message] = []
     files: List[UploadedFile] = []
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
