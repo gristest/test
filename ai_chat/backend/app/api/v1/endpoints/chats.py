@@ -50,9 +50,9 @@ def delete_chat(chat_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Chat not found")
     return db_chat
 
-@router.post("/{chat_id}/messages/", response_model=schemas.Message)
+@router.post("/{chat_id}/messages/", response_model=List[schemas.Message])
 def create_message_for_chat(chat_id: int, message: schemas.MessageCreate, db: Session = Depends(get_db)):
-    return crud.create_chat_message(db=db, message=message, chat_id=chat_id)
+    return crud.create_chat_message(db=db, message=message, chat_id=chat_id) # 此函数现在返回一个包含两条消息的列表
 
 @router.get("/{chat_id}/messages/", response_model=List[schemas.Message])
 def read_messages(chat_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

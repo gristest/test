@@ -109,10 +109,24 @@ def test_create_message():
         json={"content": "Hello", "sender": "user"}
     )
     assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["content"] == "Hello"
-    assert data["sender"] == "user"
-    assert data["chat_id"] == chat_id
+    messages = response.json()
+
+    # 端点现在返回一个包含两条消息的列表：用户的和AI的
+    assert isinstance(messages, list)
+    assert len(messages) == 2
+
+    # 验证用户消息
+    user_message = messages[0]
+    assert user_message["content"] == "Hello"
+    assert user_message["sender"] == "user"
+    assert user_message["chat_id"] == chat_id
+
+    # 验证AI消息
+    ai_message = messages[1]
+    assert isinstance(ai_message["content"], str)
+    assert len(ai_message["content"]) > 0
+    assert ai_message["sender"] == "ai"
+    assert ai_message["chat_id"] == chat_id
 
 def test_read_messages():
     res = client.post("/api/v1/chats/", json={"name": "Chat for Messages"})

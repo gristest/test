@@ -1,4 +1,6 @@
 
+import random
+from time import sleep
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -6,7 +8,7 @@ def get_chat(db: Session, chat_id: int):
     return db.query(models.Chat).filter(models.Chat.id == chat_id).first()
 
 def get_chats(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Chat).offset(skip).limit(limit).all()
+    return db.query(models.Chat).order_by(models.Chat.created_at.desc()).offset(skip).limit(limit).all()
 
 def create_chat(db: Session, chat: schemas.ChatCreate):
     db_chat = models.Chat(name=chat.name)
@@ -34,11 +36,27 @@ def get_messages(db: Session, chat_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.Message).filter(models.Message.chat_id == chat_id).offset(skip).limit(limit).all()
 
 def create_chat_message(db: Session, message: schemas.MessageCreate, chat_id: int):
+    # 1. 保存用户的消息
     db_message = models.Message(**message.model_dump(), chat_id=chat_id)
     db.add(db_message)
     db.commit()
     db.refresh(db_message)
-    return db_message
+
+    # 2. 生成并保存一条模拟的AI回复
+    ai_responses = [
+        "这个问题我需要考虑一下。",
+        "这个问题很有意思，让我想想。",
+        "我正在分析您的问题，请稍候。",
+        "这是一个很好的问题！"
+    ]
+    ai_content = random.choice(ai_responses)
+    db_ai_message = models.Message(content=ai_content, sender="ai", chat_id=chat_id)
+    db.add(db_ai_message)
+    db.commit()
+    db.refresh(db_ai_message)
+
+    sleep(0.5)  # 模拟AI处理时间
+    return [db_message, db_ai_message]
 
 def create_uploaded_file(db: Session, file: schemas.UploadedFileCreate, chat_id: int):
     db_file = models.UploadedFile(filename=file.filename, filepath=file.filepath, chat_id=chat_id)

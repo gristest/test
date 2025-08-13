@@ -71,8 +71,31 @@ export const useChatStore = defineStore('chat', {
       }
     },
     async sendMessage(chatId, message) {
-      const response = await axios.post(`${API_URL}/chats/${chatId}/messages`, message)
-      this.messages.push(response.data)
+      // 为实现乐观UI更新，先在界面上添加一条临时消息
+      const tempId = Date.now();
+      const tempMessage = {
+        ...message,
+        id: tempId,
+      };
+      this.messages.push(tempMessage);
+
+      try {
+        const response = await axios.post(`${API_URL}/chats/${chatId}/messages/`, message);
+        const [realUserMessage, aiMessage] = response.data;
+
+        // 收到后端真实数据后，用真实消息替换临时消息，并添加AI消息
+        const index = this.messages.findIndex(m => m.id === tempId);
+        if (index !== -1) {
+          this.messages.splice(index, 1, realUserMessage, aiMessage);
+        } else {
+          // 如果找不到临时消息（异常情况），直接追加
+          this.messages.push(realUserMessage, aiMessage);
+        }
+      } catch (error) {
+        this.error = error;
+        // 如果API调用失败，从界面上移除之前添加的临时消息
+        this.messages = this.messages.filter(m => m.id !== tempId);
+      }
     },
     async uploadFile(chatId, file) {
       const formData = new FormData();
