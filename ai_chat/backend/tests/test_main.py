@@ -89,13 +89,26 @@ def test_update_chat_name():
     assert data["id"] == chat_id
 
 def test_delete_chat():
+    # 1. Create chat
     res = client.post("/api/v1/chats/", json={"name": "To Be Deleted"})
     chat_id = res.json()["id"]
+
+    # 2. Upload a file to this chat to test physical deletion
+    file_content = b"this file should be deleted with the chat"
+    file_obj = ("test_delete.txt", io.BytesIO(file_content), "text/plain")
+    upload_res = client.post(f"/api/v1/chats/{chat_id}/files/", files={"file": file_obj})
+    assert upload_res.status_code == 200
+    filepath = upload_res.json()["filepath"]
+    assert os.path.exists(filepath)
+
+    # 3. Delete the chat
     response = client.delete(f"/api/v1/chats/{chat_id}")
     assert response.status_code == 200, response.text
-    # Verify it's gone
+    # 4. Verify chat is gone from DB
     get_response = client.get(f"/api/v1/chats/{chat_id}")
     assert get_response.status_code == 404
+    # 5. Verify physical file is also gone
+    assert not os.path.exists(filepath)
 
 
 def test_create_message():
@@ -155,3 +168,36 @@ def test_upload_file():
     assert data["chat_id"] == chat_id
     assert os.path.exists(data["filepath"])
     os.remove(data["filepath"]) # Clean up the created file
+
+def test_upload_file_too_large():
+    res = client.post("/api/v1/chats/", json={"name": "Chat for Large File"})
+    chat_id = res.json()["id"]
+
+    # Create a file larger than 10MB
+    large_content = b"a" * (11 * 1024 * 1024)
+    file_obj = ("large.txt", io.BytesIO(large_content), "text/plain")
+
+    response = client.post(f"/api/v1/chats/{chat_id}/files/", files={"file": file_obj})
+    assert response.status_code == 413 # Payload Too Large
+
+def test_delete_file():
+    # 1. Create chat
+    res = client.post("/api/v1/chats/", json={"name": "Chat for File Deletion"})
+    chat_id = res.json()["id"]
+
+    # 2. Upload file
+    file_content = b"file to be deleted"
+    file_obj = ("delete_me.txt", io.BytesIO(file_content), "text/plain")
+    upload_response = client.post(f"/api/v1/chats/{chat_id}/files/", files={"file": file_obj})
+    assert upload_response.status_code == 200
+    uploaded_file = upload_response.json()
+    file_id = uploaded_file["id"]
+    filepath = uploaded_file["filepath"]
+    assert os.path.exists(filepath)
+
+    # 3. Delete file
+    delete_response = client.delete(f"/api/v1/chats/{chat_id}/files/{file_id}")
+    assert delete_response.status_code == 200
+
+    # 4. Verify file is gone from disk
+    assert not os.path.exists(filepath)

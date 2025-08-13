@@ -9,7 +9,7 @@
       <button @click="toggleSidebar" class="collapse-btn">☰</button>
     </div>
     <ul>
-      <li v-for="chat in chats" :key="chat.id">
+      <li v-for="chat in chats" :key="chat.id" :class="{ 'active-chat': String(chat.id) === router.currentRoute.value.params.id }">
         <router-link :to="`/chats/${chat.id}`" class="chat-link">{{ chat.name }}</router-link>
         <div class="chat-actions" v-if="!isCollapsed">
           <button @click="renameChat(chat)" class="action-btn">✏️</button>
@@ -114,6 +114,15 @@ const removeChat = async (chatId) => {
 
 .sidebar li:hover {
   background-color: #e0e0e0;
+}
+
+.active-chat {
+  background-color: #cce5ff;
+  border-left: 4px solid #007bff;
+}
+
+.active-chat .chat-link {
+  font-weight: bold;
 }
 
 .chat-link {

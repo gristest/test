@@ -97,11 +97,44 @@ export const useChatStore = defineStore('chat', {
         this.messages = this.messages.filter(m => m.id !== tempId);
       }
     },
+    async deleteFile(chatId, fileId) {
+      try {
+        await axios.delete(`${API_URL}/chats/${chatId}/files/${fileId}`);
+        if (this.currentChat) {
+          this.currentChat.files = this.currentChat.files.filter(f => f.id !== fileId);
+        }
+      } catch (error) {
+        this.error = error;
+        alert('Failed to delete file.');
+      }
+    },
     async uploadFile(chatId, file) {
+      // 为实现上传状态UI，先添加一个临时文件对象
+      const tempFileId = `uploading-${Date.now()}`;
+      const tempFile = {
+        id: tempFileId,
+        filename: `${file.name} (uploading...)`,
+        isUploading: true,
+      };
+      if (this.currentChat) {
+        this.currentChat.files.push(tempFile);
+      }
+
       const formData = new FormData();
       formData.append('file', file);
-      const response = await axios.post(`${API_URL}/chats/${chatId}/files/`, formData);
-      this.currentChat.files.push(response.data);
+      try {
+        const response = await axios.post(`${API_URL}/chats/${chatId}/files/`, formData);
+        // 用真实数据替换临时文件
+        const index = this.currentChat.files.findIndex(f => f.id === tempFileId);
+        if (index !== -1) {
+          this.currentChat.files.splice(index, 1, response.data);
+        }
+      } catch (error) {
+        this.error = error;
+        alert(`Error uploading ${file.name}: ${error.response?.data?.detail || error.message}`);
+        // 上传失败，移除临时文件
+        this.currentChat.files = this.currentChat.files.filter(f => f.id !== tempFileId);
+      }
     }
   },
 })

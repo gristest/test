@@ -61,11 +61,32 @@ def read_messages(chat_id: int, skip: int = 0, limit: int = 100, db: Session = D
 
 @router.post("/{chat_id}/files/", response_model=schemas.UploadedFile)
 def upload_file(chat_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    # 检查文件大小 (10MB 限制)
+    file.file.seek(0, 2)
+    file_size = file.file.tell()
+    if file_size > 10 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="File too large. Limit is 10MB.")
+    file.file.seek(0)
+
     upload_dir = f"uploads/chat_{chat_id}"
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join(upload_dir, file.filename)
+
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
     db_file = schemas.UploadedFileCreate(filename=file.filename, filepath=file_path)
     return crud.create_uploaded_file(db=db, file=db_file, chat_id=chat_id)
+
+@router.delete("/{chat_id}/files/{file_id}", response_model=schemas.UploadedFile)
+def delete_file(chat_id: int, file_id: int, db: Session = Depends(get_db)):
+    db_file = crud.get_uploaded_file(db, file_id=file_id)
+
+    if db_file is None:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if db_file.chat_id != chat_id:
+        raise HTTPException(status_code=403, detail="File does not belong to this chat")
+
+    crud.delete_uploaded_file(db, db_file=db_file)
+    return db_file

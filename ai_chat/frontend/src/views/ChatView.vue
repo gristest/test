@@ -13,6 +13,15 @@
         </div>
       </div>
     </div>
+    <div class="file-management-area" v-if="currentChat && currentChat.files && currentChat.files.length > 0">
+      <strong>Attached Files:</strong>
+      <ul>
+        <li v-for="file in currentChat.files" :key="file.id">
+          <span class="filename">{{ file.filename }}</span>
+          <button @click="removeFile(file.id)" :disabled="file.isUploading" class="delete-file-btn">🗑️</button>
+        </li>
+      </ul>
+    </div>
     <div class="input-container">
       <button @click="triggerFileUpload" class="attach-btn">📎</button>
       <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none" />
@@ -35,6 +44,7 @@ const fileInput = ref(null)
 const messagesContainer = ref(null)
 
 const messages = computed(() => store.messages)
+const currentChat = computed(() => store.currentChat)
 
 watch(() => route.params.id, (newId) => {
   if (newId) {
@@ -64,6 +74,12 @@ const sendMessage = async () => {
   if (newMessage.value.trim() !== '') {
     await store.sendMessage(route.params.id, { content: newMessage.value, sender: 'user' })
     newMessage.value = ''
+  }
+}
+
+const removeFile = (fileId) => {
+  if (confirm('Are you sure you want to delete this file?')) {
+    store.deleteFile(route.params.id, fileId);
   }
 }
 
@@ -162,6 +178,46 @@ const handleFileUpload = async (event) => {
   background-color: #f1f1f1;
 }
 
+.file-management-area {
+  padding: 10px 20px;
+  border-top: 1px solid #ddd;
+  background-color: #f8f9fa;
+  font-size: 0.9em;
+}
+
+.file-management-area ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.file-management-area li {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #e9ecef;
+  border-radius: 15px;
+  border: 1px solid #dee2e6;
+}
+
+.filename {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+}
+
+.delete-file-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
 .input-container {
   display: flex;
   padding: 10px;

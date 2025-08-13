@@ -1,5 +1,7 @@
 
 import random
+import os
+import shutil
 from time import sleep
 from sqlalchemy.orm import Session
 from . import models, schemas
@@ -28,6 +30,11 @@ def update_chat_name(db: Session, chat_id: int, name: str):
 def delete_chat(db: Session, chat_id: int):
     db_chat = get_chat(db, chat_id)
     if db_chat:
+        # 在删除数据库记录前，先删除关联的物理文件和目录
+        upload_dir = f"uploads/chat_{chat_id}"
+        if os.path.isdir(upload_dir):
+            shutil.rmtree(upload_dir)
+
         db.delete(db_chat)
         db.commit()
     return db_chat
@@ -64,3 +71,16 @@ def create_uploaded_file(db: Session, file: schemas.UploadedFileCreate, chat_id:
     db.commit()
     db.refresh(db_file)
     return db_file
+
+def get_uploaded_file(db: Session, file_id: int):
+    return db.query(models.UploadedFile).filter(models.UploadedFile.id == file_id).first()
+
+def delete_uploaded_file(db: Session, db_file: models.UploadedFile):
+    """
+    Deletes a file from the filesystem and the database.
+    Assumes ownership has already been verified.
+    """
+    if os.path.exists(db_file.filepath):
+        os.remove(db_file.filepath)
+    db.delete(db_file)
+    db.commit()
