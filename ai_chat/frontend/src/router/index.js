@@ -7,10 +7,10 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      redirect: '/chats/new'
+      redirect: '/chats'
     },
     {
-      path: '/chats/:id',
+      path: '/chats/:id?',
       name: 'chat',
       component: ChatView,
       props: true
