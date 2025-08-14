@@ -1,0 +1,15 @@
+{
+  "newChat": "New Chat",
+  "rename": "Rename",
+  "delete": "Delete",
+  "deleteChatConfirmation": "Are you sure you want to delete this chat?",
+  "enterNewChatName": "Enter new chat name:",
+  "noChatSelected": "No chat selected",
+  "noChatSelectedHint": "Select a chat from the sidebar or create a new one to begin.",
+  "typeMessage": "Type a message...",
+  "send": "Send",
+  "attachedFiles": "Attached Files:",
+  "deleteFileConfirmation": "Are you sure you want to delete this file?",
+  "user": "User",
+  "ai": "AI"
+}

@@ -3,17 +3,33 @@
   <div class="sidebar" :class="{ collapsed: isCollapsed }">
     <div class="sidebar-header">
       <button @click="newChat" class="new-chat-btn">
-        <span v-if="!isCollapsed">New Chat</span>
+        <span v-if="!isCollapsed">{{ $t('newChat') }}</span>
         <span v-else>+</span>
       </button>
-      <button @click="toggleSidebar" class="collapse-btn">☰</button>
+      <div class="sidebar-actions">
+        <div class="language-switcher">
+          <button @click="toggleLanguageMenu" class="language-btn">🌐</button>
+          <ul v-if="showLanguageMenu" class="language-menu">
+            <li @click="switchLanguage('en')">
+              <span v-if="currentLocale === 'en'">✔️</span> English
+            </li>
+            <li @click="switchLanguage('zh-CN')">
+              <span v-if="currentLocale === 'zh-CN'">✔️</span> 简体中文
+            </li>
+            <li @click="switchLanguage('zh-TW')">
+              <span v-if="currentLocale === 'zh-TW'">✔️</span> 繁體中文
+            </li>
+          </ul>
+        </div>
+        <button @click="toggleSidebar" class="collapse-btn">☰</button>
+      </div>
     </div>
     <ul>
       <li v-for="chat in chats" :key="chat.id" :class="{ 'active-chat': String(chat.id) === router.currentRoute.value.params.id }">
         <router-link :to="`/chats/${chat.id}`" class="chat-link">{{ chat.name }}</router-link>
         <div class="chat-actions" v-if="!isCollapsed">
-          <button @click="renameChat(chat)" class="action-btn">✏️</button>
-          <button @click="removeChat(chat.id)" class="action-btn">🗑️</button>
+          <button @click="renameChat(chat)" class="action-btn" :title="$t('rename')">✏️</button>
+          <button @click="removeChat(chat.id)" class="action-btn" :title="$t('delete')">🗑️</button>
         </div>
       </li>
     </ul>
@@ -24,11 +40,15 @@
 import { onMounted, computed, ref } from 'vue'
 import { useChatStore } from '../store'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const store = useChatStore()
 const router = useRouter()
+const { t, locale } = useI18n()
 
 const chats = computed(() => store.chats)
+const currentLocale = computed(() => locale.value)
+const showLanguageMenu = ref(false)
 
 onMounted(() => {
   store.fetchChats()
@@ -46,20 +66,30 @@ const toggleSidebar = () => {
 const isCollapsed = ref(false)
 
 const renameChat = async (chat) => {
-  const newName = prompt("Enter new chat name:", chat.name);
+  const newName = prompt(t('enterNewChatName'), chat.name);
   if (newName && newName.trim() !== '') {
     await store.updateChatName(chat.id, newName.trim());
   }
 }
 
 const removeChat = async (chatId) => {
-  if (confirm("Are you sure you want to delete this chat?")) {
+  if (confirm(t('deleteChatConfirmation'))) {
     await store.deleteChat(chatId);
     // If the current chat is deleted, navigate away
     if (router.currentRoute.value.params.id === String(chatId)) {
       router.push('/');
     }
   }
+}
+
+const toggleLanguageMenu = () => {
+  showLanguageMenu.value = !showLanguageMenu.value
+}
+
+const switchLanguage = (lang) => {
+  locale.value = lang
+  document.cookie = `locale=${lang};path=/;max-age=31536000` // 1 year
+  showLanguageMenu.value = false
 }
 </script>
 
@@ -94,6 +124,53 @@ const removeChat = async (chatId) => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+}
+
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.language-switcher {
+  position: relative;
+  margin-right: 10px;
+}
+
+.language-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+.language-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+  z-index: 100;
+}
+
+.language-menu li {
+  padding: 8px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.language-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+.language-menu li span {
+  margin-right: 5px;
+  width: 15px;
+  display: inline-block;
 }
 
 .sidebar ul {

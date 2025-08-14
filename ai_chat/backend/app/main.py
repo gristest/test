@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.v1 import api
@@ -22,6 +22,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_locale_to_request(request: Request, call_next):
+    locale = request.cookies.get("locale", "en")
+    request.state.locale = locale
+    response = await call_next(request)
+    return response
 
 app.include_router(api.api_router, prefix="/api/v1")
 

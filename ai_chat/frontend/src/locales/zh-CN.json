@@ -1,0 +1,15 @@
+{
+  "newChat": "新建对话",
+  "rename": "重命名",
+  "delete": "删除",
+  "deleteChatConfirmation": "您确定要删除此对话吗？",
+  "enterNewChatName": "输入新的对话名称：",
+  "noChatSelected": "未选择对话",
+  "noChatSelectedHint": "从侧边栏选择一个对话或创建一个新对话以开始。",
+  "typeMessage": "输入消息...",
+  "send": "发送",
+  "attachedFiles": "附件：",
+  "deleteFileConfirmation": "您确定要删除此文件吗？",
+  "user": "用户",
+  "ai": "人工智能"
+}

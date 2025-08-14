@@ -1,32 +1,32 @@
 <template>
   <div v-if="!route.params.id" class="no-chat-selected">
-    <h1>AI Chat</h1>
-    <p>Select a chat from the sidebar or create a new one to begin.</p>
+    <h1>{{ $t('ai') }} Chat</h1>
+    <p>{{ $t('noChatSelectedHint') }}</p>
   </div>
   <div v-else class="chat-view">
     <div class="messages-container" ref="messagesContainer">
       <div v-for="message in messages" :key="message.id" class="message" :class="`message-${message.sender}`">
-        <div class="avatar">{{ message.sender === 'user' ? 'U' : 'AI' }}</div>
+        <div class="avatar">{{ message.sender === 'user' ? $t('user') : $t('ai') }}</div>
         <div class="content-wrapper">
-          <div class="sender">{{ message.sender }}</div>
+          <div class="sender">{{ message.sender === 'user' ? $t('user') : $t('ai') }}</div>
           <div class="content">{{ message.content }}</div>
         </div>
       </div>
     </div>
     <div class="file-management-area" v-if="currentChat && currentChat.files && currentChat.files.length > 0">
-      <strong>Attached Files:</strong>
+      <strong>{{ $t('attachedFiles') }}</strong>
       <ul>
         <li v-for="file in currentChat.files" :key="file.id">
           <span class="filename">{{ file.filename }}</span>
-          <button @click="removeFile(file.id)" :disabled="file.isUploading" class="delete-file-btn">🗑️</button>
+          <button @click="removeFile(file.id)" :disabled="file.isUploading" class="delete-file-btn" :title="$t('delete')">🗑️</button>
         </li>
       </ul>
     </div>
     <div class="input-container">
       <button @click="triggerFileUpload" class="attach-btn">📎</button>
       <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none" />
-      <textarea v-model="newMessage" @keyup.enter.prevent="handleEnter" placeholder="Type a message..."></textarea>
-      <button @click="sendMessage" :disabled="!newMessage.trim()">Send</button>
+      <textarea v-model="newMessage" @keyup.enter.prevent="handleEnter" :placeholder="$t('typeMessage')"></textarea>
+      <button @click="sendMessage" :disabled="!newMessage.trim()">{{ $t('send') }}</button>
     </div>
   </div>
 </template>
@@ -35,9 +35,11 @@
 import { ref, watch, computed, nextTick } from 'vue'
 import { useChatStore } from '../store'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const store = useChatStore()
 const route = useRoute()
+const { t } = useI18n()
 
 const newMessage = ref('')
 const fileInput = ref(null)
@@ -78,7 +80,7 @@ const sendMessage = async () => {
 }
 
 const removeFile = (fileId) => {
-  if (confirm('Are you sure you want to delete this file?')) {
+  if (confirm(t('deleteFileConfirmation'))) {
     store.deleteFile(route.params.id, fileId);
   }
 }
