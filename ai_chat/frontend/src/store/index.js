@@ -1,7 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'
+import apiClient from '../services/api'
 
 export const useChatStore = defineStore('chat', {
   state: () => ({
@@ -15,7 +13,7 @@ export const useChatStore = defineStore('chat', {
     async fetchChats() {
       try {
         this.loading = true;
-        const response = await axios.get(`${API_URL}/chats`);
+        const response = await apiClient.get('/chats');
         this.chats = response.data;
       } catch (error) {
         this.error = error;
@@ -26,7 +24,7 @@ export const useChatStore = defineStore('chat', {
     async fetchChat(id) {
       try {
         this.loading = true;
-        const response = await axios.get(`${API_URL}/chats/${id}`);
+        const response = await apiClient.get(`/chats/${id}`);
         this.currentChat = response.data;
         this.messages = response.data.messages;
       } catch (error) {
@@ -37,7 +35,7 @@ export const useChatStore = defineStore('chat', {
     },
     async createNewChat() {
       try {
-        const response = await axios.post(`${API_URL}/chats`, { name: 'New Chat' });
+        const response = await apiClient.post('/chats', { name: 'New Chat' });
         this.chats.unshift(response.data); // Add to the top of the list
         return response.data;
       } catch (error) {
@@ -46,7 +44,7 @@ export const useChatStore = defineStore('chat', {
     },
     async updateChatName(chatId, newName) {
       try {
-        const response = await axios.put(`${API_URL}/chats/${chatId}`, { name: newName });
+        const response = await apiClient.put(`/chats/${chatId}`, { name: newName });
         const index = this.chats.findIndex(c => c.id === chatId);
         if (index !== -1) {
             this.chats[index].name = response.data.name;
@@ -60,7 +58,7 @@ export const useChatStore = defineStore('chat', {
     },
     async deleteChat(chatId) {
       try {
-        await axios.delete(`${API_URL}/chats/${chatId}`);
+        await apiClient.delete(`/chats/${chatId}`);
         this.chats = this.chats.filter(c => c.id !== chatId);
         if (this.currentChat && this.currentChat.id === chatId) {
           this.currentChat = null;
@@ -80,7 +78,7 @@ export const useChatStore = defineStore('chat', {
       this.messages.push(tempMessage);
 
       try {
-        const response = await axios.post(`${API_URL}/chats/${chatId}/messages/`, message);
+        const response = await apiClient.post(`/chats/${chatId}/messages/`, message);
         const [realUserMessage, aiMessage] = response.data;
 
         // 收到后端真实数据后，用真实消息替换临时消息，并添加AI消息
@@ -99,7 +97,7 @@ export const useChatStore = defineStore('chat', {
     },
     async deleteFile(chatId, fileId) {
       try {
-        await axios.delete(`${API_URL}/chats/${chatId}/files/${fileId}`);
+        await apiClient.delete(`/chats/${chatId}/files/${fileId}`);
         if (this.currentChat) {
           this.currentChat.files = this.currentChat.files.filter(f => f.id !== fileId);
         }
@@ -123,7 +121,7 @@ export const useChatStore = defineStore('chat', {
       const formData = new FormData();
       formData.append('file', file);
       try {
-        const response = await axios.post(`${API_URL}/chats/${chatId}/files/`, formData);
+        const response = await apiClient.post(`/chats/${chatId}/files/`, formData);
         // 用真实数据替换临时文件
         const index = this.currentChat.files.findIndex(f => f.id === tempFileId);
         if (index !== -1) {
@@ -138,3 +136,4 @@ export const useChatStore = defineStore('chat', {
     }
   },
 })
+

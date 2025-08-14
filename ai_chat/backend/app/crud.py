@@ -2,7 +2,6 @@
 import random
 import os
 import shutil
-from time import sleep
 from sqlalchemy.orm import Session
 from . import models, schemas
 
@@ -78,7 +77,6 @@ def create_chat_message(db: Session, message: schemas.MessageCreate, chat_id: in
     db.commit()
     db.refresh(db_ai_message)
 
-    sleep(0.5)  # 模拟AI处理时间
     return [db_message, db_ai_message]
 
 def create_uploaded_file(db: Session, file: schemas.UploadedFileCreate, chat_id: int):

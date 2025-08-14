@@ -1,5 +1,6 @@
 
 import os
+from time import sleep
 import shutil
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlalchemy.orm import Session
@@ -53,6 +54,8 @@ def delete_chat(chat_id: int, db: Session = Depends(get_db)):
 @router.post("/{chat_id}/messages/", response_model=List[schemas.Message])
 def create_message_for_chat(chat_id: int, message: schemas.MessageCreate, request: Request, db: Session = Depends(get_db)):
     locale = request.state.locale
+    print(f" ========== 语言  ==========： {locale}")
+    sleep(0.5)  # 模拟AI处理时间
     return crud.create_chat_message(db=db, message=message, chat_id=chat_id, locale=locale)
 
 @router.get("/{chat_id}/messages/", response_model=List[schemas.Message])

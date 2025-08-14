@@ -7,17 +7,17 @@
         <span v-else>+</span>
       </button>
       <div class="sidebar-actions">
-        <div class="language-switcher">
+        <div class="language-switcher" v-click-outside="closeLanguageMenu">
           <button @click="toggleLanguageMenu" class="language-btn">🌐</button>
           <ul v-if="showLanguageMenu" class="language-menu">
             <li @click="switchLanguage('en')">
-              <span v-if="currentLocale === 'en'">✔️</span> English
+              <span class="check-mark"><span v-if="currentLocale === 'en'">✔️</span></span> <span class="lang-text">English</span>
             </li>
             <li @click="switchLanguage('zh-CN')">
-              <span v-if="currentLocale === 'zh-CN'">✔️</span> 简体中文
+              <span class="check-mark"><span v-if="currentLocale === 'zh-CN'">✔️</span></span> <span class="lang-text">简体中文</span>
             </li>
             <li @click="switchLanguage('zh-TW')">
-              <span v-if="currentLocale === 'zh-TW'">✔️</span> 繁體中文
+              <span class="check-mark"><span v-if="currentLocale === 'zh-TW'">✔️</span></span> <span class="lang-text">繁體中文</span>
             </li>
           </ul>
         </div>
@@ -86,11 +86,29 @@ const toggleLanguageMenu = () => {
   showLanguageMenu.value = !showLanguageMenu.value
 }
 
+const closeLanguageMenu = () => {
+  showLanguageMenu.value = false
+}
+
 const switchLanguage = (lang) => {
   locale.value = lang
   document.cookie = `locale=${lang};path=/;max-age=31536000` // 1 year
   showLanguageMenu.value = false
 }
+
+const vClickOutside = {
+  beforeMount(el, binding) {
+    el.clickOutsideEvent = function(event) {
+      if (!(el === event.target || el.contains(event.target))) {
+        binding.value(event, el);
+      }
+    };
+    document.body.addEventListener('click', el.clickOutsideEvent);
+  },
+  unmounted(el) {
+    document.body.removeEventListener('click', el.clickOutsideEvent);
+  },
+};
 </script>
 
 <style scoped>
@@ -133,7 +151,7 @@ const switchLanguage = (lang) => {
 
 .language-switcher {
   position: relative;
-  margin-right: 10px;
+  margin-right: 10px;  
 }
 
 .language-btn {
@@ -154,6 +172,7 @@ const switchLanguage = (lang) => {
   padding: 5px 0;
   margin: 0;
   z-index: 100;
+  min-width: 120px;
 }
 
 .language-menu li {
@@ -161,16 +180,22 @@ const switchLanguage = (lang) => {
   cursor: pointer;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .language-menu li:hover {
   background-color: #f0f0f0;
 }
 
-.language-menu li span {
-  margin-right: 5px;
-  width: 15px;
+.language-menu li .check-mark {
   display: inline-block;
+  width: 20px;
+  text-align: center;
+  margin-right: 5px;
+}
+
+.language-menu li .lang-text {
+  margin-left: 0.5em;
 }
 
 .sidebar ul {
@@ -183,7 +208,7 @@ const switchLanguage = (lang) => {
 .sidebar li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  
   margin-bottom: 10px;
   border-radius: 5px;
   padding: 5px;
@@ -223,3 +248,4 @@ const switchLanguage = (lang) => {
   visibility: visible;
 }
 </style>
+
